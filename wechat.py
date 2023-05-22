@@ -1,7 +1,11 @@
 import hashlib
+import os
 
 from app import app
 from flask import request
+
+
+TOKEN = os.environ.get('WECHAT_TOKEN')
 
 """
 微信登录请求接口
@@ -27,7 +31,7 @@ def verify():
         nonce = data.get('nonce')
         echostr = data.get('echostr')
 
-        token = "wechatcallback"  # 请按照公众平台官网\基本配置中信息填写
+        token = TOKEN  # 请按照公众平台官网\基本配置中信息填写
 
         list = [token, timestamp, nonce]
         list.sort()
