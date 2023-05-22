@@ -3,7 +3,7 @@ import openai
 
 from flask import request, session
 
-
+default_module = 'text-davinci-003'
 chat_model = 'gpt-3.5-turbo'
 edit_model = 'text-davinci-edit-001'
 auth_key = os.getenv('AUTH_KEY')
@@ -25,8 +25,8 @@ def chatgpt():
         return {"code": 10001, "msg": "提示词为空"}
 
     model = data.get('model')
-    if model != chat_model:
-        return {"code": 10002, "msg": "指定模型无效"}
+    if not model:
+        model = default_module
 
     temperature = data.get('temperature', 0)
     if temperature < 0 or temperature > 1:
