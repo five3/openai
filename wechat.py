@@ -48,11 +48,12 @@ def verify():
 
     else:
         args = request.args
-        data = request.form
+        form = request.form
         js = request.json
 
         print(f'args: {args}')
-        print(f'data: {data}')
+        print(f'data: {form}')
         print(f'js: {js}')
+        print(f'data: {request.data}')
 
-        return "测试内容"
+        return "success"
