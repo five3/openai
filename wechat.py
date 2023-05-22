@@ -1,16 +1,14 @@
 import hashlib
 import os
 
-from app import app
 from flask import request
 
 
-TOKEN = os.environ.get('WECHAT_TOKEN')
+TOKEN = os.getenv('WECHAT_TOKEN')
 
 """
 微信登录请求接口
 """
-@app.route("/wechat/login", methods=("POST"))
 def login():
     pass
 
@@ -18,7 +16,6 @@ def login():
 '''
 微信公众号关键字恢复回调接口
 '''
-@app.route("/wechat/verify")
 def verify():
     try:
         data = request.args

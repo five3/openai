@@ -2,27 +2,21 @@ import os
 
 import openai
 from flask import Flask, redirect, render_template, request, url_for
+from ai import chatgpt
+from wechat import login, verify
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.urandom(16)
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+app.route('/api/chatgpt', methods=['POST'])(chatgpt)
+app.route('/wechat/login', methods=['POST'])(login)
+app.route('/wechat/verify', methods=['GET'])(verify)
 
 
 @app.route("/", methods=("GET", "POST"))
 def index():
     return render_template("index.html", result="")
-
-
-def generate_prompt(animal):
-    return """Suggest three names for an animal that is a superhero.
-
-Animal: Cat
-Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
-Animal: Dog
-Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
-Animal: {}
-Names:""".format(
-        animal.capitalize()
-    )
 
 
 if __name__ == '__main__':

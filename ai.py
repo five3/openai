@@ -1,7 +1,6 @@
 import os
 import openai
 
-from app import app
 from flask import request, session
 
 
@@ -10,10 +9,8 @@ edit_model = 'text-davinci-edit-001'
 auth_key = os.getenv('AUTH_KEY')
 message_map = {}
 answer_map = {}
-app.config['SECRET_KEY'] = os.urandom(16)
 
 
-@app.route("/api/chatgpt", methods="POST")
 def chatgpt():
     if not auth():
         return {"code": 10000, "msg": "当前无权限"}
@@ -21,11 +18,11 @@ def chatgpt():
     data = request.json
     print(data)
 
-    prompt = data.get('prompt').strip()
-    if not prompt:
+    prompt = data.get('prompt')
+    if not prompt or not prompt.strip():
         return {"code": 10001, "msg": "提示词为空"}
-    model = data.get('model')
 
+    model = data.get('model')
     if model != chat_model:
         return {"code": 10002, "msg": "指定模型无效"}
 
@@ -41,7 +38,7 @@ def chatgpt():
 
     message_map.setdefault(chat_session_id, []).append({
         'role': 'user',
-        'content': prompt
+        'content': prompt.strip()
     })
 
     ans = call_chatgpt(message_map[chat_session_id], model, temperature, max_tokens)
