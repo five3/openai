@@ -11,7 +11,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app.route('/api/chatgpt', methods=['POST'])(chatgpt)
 app.route('/wechat/login', methods=['POST'])(login)
-app.route('/wechat/verify', methods=['GET'])(verify)
+app.route('/wechat/verify', methods=['GET', 'POST'])(verify)
 
 
 @app.route("/", methods=("GET", "POST"))

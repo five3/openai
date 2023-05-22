@@ -9,7 +9,9 @@ edit_model = 'text-davinci-edit-001'
 auth_key = os.getenv('AUTH_KEY')
 message_map = {}
 answer_map = {}
-
+turns = []
+last_result = ''
+text = ''
 
 def chatgpt():
     if not auth():
@@ -36,12 +38,12 @@ def chatgpt():
 
     chat_session_id = data.get('chat_session_id', os.urandom(16))
 
-    message_map.setdefault(chat_session_id, []).append({
-        'role': 'user',
-        'content': prompt.strip()
-    })
+    # message_map.setdefault(chat_session_id, []).append({
+    #     'role': 'user',
+    #     'content': prompt.strip()
+    # })
 
-    ans = call_chatgpt(message_map[chat_session_id], model, temperature, max_tokens)
+    ans = call_chatgpt(prompt, model, temperature, max_tokens)
 
     return {"code": 0, "msg": "执行成功", "data": ans}
 
@@ -54,12 +56,26 @@ def auth():
             return True
 
 
-def call_chatgpt(message, model='text-davinci-003', temperature=0, max_tokens=100):
+def call_chatgpt(prompt, model='text-davinci-003', temperature=0, max_tokens=100):
+    global turns
+    global last_result
+    global text
+
+    prompt = text + "\nHuman: " + prompt
     response = openai.Completion.create(
         model=model,
-        messages=message,
+        prompt=prompt,
         temperature=temperature,
         max_tokens=max_tokens
     )
 
-    return response.choices[0].text
+    result = response["choices"][0]["text"].strip()
+    last_result = result
+    turns += [prompt] + [result]  # 只有这样迭代才能连续提问理解上下文
+
+    if len(turns) <= 10:  # 为了防止超过字数限制程序会爆掉，所以提交的话轮语境为10次。
+        text = " ".join(turns)
+    else:
+        text = " ".join(turns[-10:])
+
+    return result

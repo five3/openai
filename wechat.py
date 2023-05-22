@@ -17,31 +17,42 @@ def login():
 微信公众号关键字恢复回调接口
 '''
 def verify():
-    try:
-        data = request.args
-        if len(data) == 0:
-            return "hello, this is handle view"
+    if request.method == 'GET':
+        try:
+            data = request.args
+            if len(data) == 0:
+                return "hello, this is handle view"
 
-        print(data)
-        signature = data.get('signature')
-        timestamp = data.get('timestamp')
-        nonce = data.get('nonce')
-        echostr = data.get('echostr')
+            print(data)
+            signature = data.get('signature')
+            timestamp = data.get('timestamp')
+            nonce = data.get('nonce')
+            echostr = data.get('echostr')
 
-        token = TOKEN  # 请按照公众平台官网\基本配置中信息填写
+            token = TOKEN  # 请按照公众平台官网\基本配置中信息填写
 
-        list = [token, timestamp, nonce]
-        list.sort()
-        sha1 = hashlib.sha1()
-        map(sha1.update, list)
-        hashcode = sha1.hexdigest()
+            list = [token, timestamp, nonce]
+            list.sort()
+            sha1 = hashlib.sha1()
+            map(sha1.update, list)
+            hashcode = sha1.hexdigest()
 
-        print("handle/GET func: hashcode, signature: ", hashcode, signature)
+            print("handle/GET func: hashcode, signature: ", hashcode, signature)
 
-        if hashcode == signature:
-            return echostr
-        else:
-            return ""
+            if hashcode == signature:
+                return echostr
+            else:
+                return ""
+        except Exception as Argument:
+            return Argument
 
-    except Exception as Argument:
-        return Argument
+    else:
+        args = request.args
+        data = request.form
+        js = request.json
+
+        print(f'args: {args}')
+        print(f'data: {data}')
+        print(f'js: {js}')
+
+        return "测试内容"
