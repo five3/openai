@@ -3,7 +3,7 @@ import os
 
 from threading import Thread
 from flask import request
-from wechat_handler import receive, reply
+from wechat_handler import receive, reply, util
 
 
 TOKEN = os.getenv('WECHAT_TOKEN')
@@ -74,3 +74,8 @@ def verify():
 
 def deal_with_chatgpt(recMsg):
     print(f"处理用户信息: {recMsg.Content}")
+
+    # TODO: work with recMsg.Content
+    result = '已处理的回答'
+
+    util.send_msg_to_user(recMsg, result)
