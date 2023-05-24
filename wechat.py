@@ -1,6 +1,7 @@
 import hashlib
 import os
 
+from threading import Thread
 from flask import request
 from wechat_handler import receive, reply
 
@@ -58,11 +59,18 @@ def verify():
             if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
-                content = "test"
+                content = "消息已收到，正在努力思考中，请稍后！(具体与问答问题的内容长度有关)"
                 replyMsg = reply.TextMsg(toUser, fromUser, content)
+
+                Thread(target=deal_with_chatgpt, args=(recMsg,), name=recMsg.MsgId).start()
+
                 return replyMsg.send()
             else:
                 print("暂且不处理")
                 return "success"
         except Exception as e:
             return e
+
+
+def deal_with_chatgpt(recMsg):
+    print(f"处理用户信息: {recMsg.Content}")
