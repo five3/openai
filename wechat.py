@@ -2,6 +2,7 @@ import hashlib
 import os
 
 from flask import request
+from wechat_handler import receive, reply
 
 
 TOKEN = os.getenv('WECHAT_TOKEN')
@@ -48,12 +49,20 @@ def verify():
 
     else:
         args = request.args
-        form = request.form
-        js = request.json
-
+        data = request.data
         print(f'args: {args}')
-        print(f'data: {form}')
-        print(f'js: {js}')
-        print(f'data: {request.data}')
+        print(f'Handle Post webdata is : {data}')
 
-        return "success"
+        try:
+            recMsg = receive.parse_xml(data)
+            if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
+                toUser = recMsg.FromUserName
+                fromUser = recMsg.ToUserName
+                content = "test"
+                replyMsg = reply.TextMsg(toUser, fromUser, content)
+                return replyMsg.send()
+            else:
+                print("暂且不处理")
+                return "success"
+        except Exception as e:
+            return e
