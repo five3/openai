@@ -1,7 +1,7 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnAddinLoad">
     <ribbon startFromScratch="false">
         <tabs>
-            <tab id="wpsAddinTab" label="wps加载项示例">
+            <tab id="wpsAddinTab" label="wps">
 				<group id="btnDemoGroup" label="group1">
                     <button id="btnShowMsg" label="弹出消息框" onAction="OnAction" getEnabled="OnGetEnabled"  getImage="GetImage" visible="true" size="large"/>
                     <button id="btnIsEnbable" getLabel="OnGetLabel" onAction="OnAction" enabled="true"  getImage="GetImage" visible="true" size="large"/>
