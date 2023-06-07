@@ -1,3 +1,4 @@
 <jsplugins>
-    <jsplugin name="word"  version="3.6" type="wps" url="http://chat.testqa.cn/static/wps/plugins/word.7z"/>
+    <jsplugin enable="true" name="word"  version="1.0.0" type="wps" url="http://chat.testqa.cn/static/wps/plugins/word.7z"/>
+    <jspluginonline enable="true" name="word"  version="1.0.0" type="wps" url="http://chat.testqa.cn/static/wps/plugins/word"/>
 </jsplugins>
