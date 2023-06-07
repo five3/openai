@@ -75,7 +75,7 @@ def verify():
 def deal_with_chatgpt(recMsg):
     print(f"处理用户信息: {recMsg.Content}")
 
-    # TODO: work with recMsg.Content
+    # TODO: work with recMsg.Content and get result
     result = '已处理的回答'
 
     util.send_msg_to_user(recMsg, result)
