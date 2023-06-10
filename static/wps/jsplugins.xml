@@ -1,4 +1,3 @@
 <jsplugins>
-<!--    <jsplugin enable="true" name="word"  version="1.0.0" type="wps" url="http://chat.testqa.cn/static/wps/plugins/word.7z"/>-->
-    <jspluginonline name="word" type="wps" url="http://chat.testqa.cn/static/wps/plugins/word/"/>
+    <jsplugin name="chatgpt-word"  version="1.0.0" type="wps" url="http://chat.testqa.cn/static/wps/plugins/chatgpt-word.7z"/>
 </jsplugins>

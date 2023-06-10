@@ -13,6 +13,26 @@ turns = []
 last_result = ''
 text = ''
 
+
+def chatgpt_answer():
+    """
+    问答模式
+    :return:
+    """
+    question = request.args.get("question")
+    if not question or question.strip() == '':
+        return ""
+
+    response = openai.Completion.create(
+        model=default_module,
+        prompt=question,
+        temperature=0,
+        max_tokens=1000
+    )
+
+    return response["choices"][0]["text"].strip()
+
+
 def chatgpt():
     if not auth():
         return {"code": 10000, "msg": "当前无权限"}
