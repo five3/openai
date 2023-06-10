@@ -1,4 +1,9 @@
+from flask import make_response
 
 
 def warp_resp(txt):
-    return txt, 200, {"Access-Control-Allow-Origin", "*"}
+    rep = make_response(txt)
+    rep.status_code = 200
+    rep.headers["Access-Control-Allow-Origin"] = "*"
+
+    return rep
