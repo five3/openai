@@ -2,7 +2,7 @@ import os
 import openai
 
 from flask import request, session
-from .util import warp_resp
+from util import warp_resp
 
 default_module = 'text-davinci-003'
 chat_model = 'gpt-3.5-turbo'
