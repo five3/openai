@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = os.urandom(16)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app.route('/api/chatgpt', methods=['POST'])(chatgpt)
-app.route('/api/chatgpt/answer', methods=['POST'])(chatgpt_answer)
+app.route('/api/chatgpt/answer', methods=['GET'])(chatgpt_answer)
 app.route('/wechat/login', methods=['POST'])(login)
 app.route('/wechat/verify', methods=['GET', 'POST'])(verify)
 
