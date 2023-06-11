@@ -8,10 +8,11 @@ from wechat_handler import receive, reply, util
 
 TOKEN = os.getenv('WECHAT_TOKEN')
 
+
 """
 微信登录请求接口
 """
-def login():
+def wechat_login():
     pass
 
 

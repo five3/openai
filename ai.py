@@ -22,7 +22,10 @@ def chatgpt_answer():
     """
     question = request.args.get("question")
     if not question or question.strip() == '':
-        return ""
+        return warp_resp("问题不能为空")
+
+    if not auth():
+        return warp_resp("当前用户使用额度已经用户，请联系管理员five3@163.com")
 
     response = openai.Completion.create(
         model=default_module,
@@ -34,69 +37,66 @@ def chatgpt_answer():
     return warp_resp(response["choices"][0]["text"].strip())
 
 
-def chatgpt():
+def chatgpt_chat():
     if not auth():
         return {"code": 10000, "msg": "当前无权限"}
 
     data = request.json
     print(data)
 
-    prompt = data.get('prompt')
-    if not prompt or not prompt.strip():
+    messages = data.get('messages')
+    if not messages:
         return {"code": 10001, "msg": "提示词为空"}
-
-    model = data.get('model')
-    if not model:
-        model = default_module
 
     temperature = data.get('temperature', 0)
     if temperature < 0 or temperature > 1:
         temperature = 0
 
-    max_tokens = data.get('max_tokens', 100)
+    max_tokens = data.get('max_tokens', 500)
     if max_tokens > 1000:
         max_tokens = 1000
 
     chat_session_id = data.get('chat_session_id', os.urandom(16))
 
-    # message_map.setdefault(chat_session_id, []).append({
-    #     'role': 'user',
-    #     'content': prompt.strip()
-    # })
-
-    ans = call_chatgpt(prompt, model, temperature, max_tokens)
-
-    return {"code": 0, "msg": "执行成功", "data": ans}
-
-
-def auth():
-    auth_txt = request.headers.get('Authorization')
-    if auth_txt and auth_txt.startswith('Bearer '):
-        auth_txt = auth_txt.strip().split(' ')[1]
-        if auth_txt == auth_key:
-            return True
-
-
-def call_chatgpt(prompt, model='text-davinci-003', temperature=0, max_tokens=100):
-    global turns
-    global last_result
-    global text
-
-    prompt = text + "\nHuman: " + prompt
-    response = openai.Completion.create(
-        model=model,
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model=chat_model,
+        messages=messages,
         temperature=temperature,
         max_tokens=max_tokens
     )
 
-    result = response["choices"][0]["text"].strip()
-    last_result = result
-    turns += [prompt] + [result]  # 只有这样迭代才能连续提问理解上下文
+    data = response["choices"][0]["message"]['content'].strip()
 
-    if len(turns) <= 10:  # 为了防止超过字数限制程序会爆掉，所以提交的话轮语境为10次。
-        text = " ".join(turns)
-    else:
-        text = " ".join(turns[-10:])
+    return {"code": 0, "msg": "执行成功", "data": data}
 
-    return result
+
+def auth():
+    if auth_bearer():
+        return True
+
+    if auth_login():
+        return True
+
+    return auth_anonymous()
+
+
+def auth_bearer():
+    auth_txt = request.headers.get('Authorization')
+    if auth_txt and auth_txt.startswith('Bearer '):
+        bearer = auth_txt.strip().split(' ')[1]
+        if bearer == auth_key:
+            return True
+
+        # TODO: 根据bearer值查询用户使用额度
+
+    return False
+
+
+def auth_login():
+    # 获取用户session， 根据用户id查询使用额度
+    return False
+
+
+def auth_anonymous():
+    # 根据ip来查询使用额度, 新用户有50次请求
+    return True
