@@ -69,7 +69,7 @@ def call_gpt(messages, temperature, max_tokens):
         temperature=temperature,
         max_tokens=max_tokens
     )
-    db.decr(g['bearer'])
+    db.decr(g.bearer)
 
     return response["choices"][0]["message"]['content'].strip()
 
@@ -88,7 +88,7 @@ def auth_bearer():
     auth_txt = request.headers.get('Authorization')
     if auth_txt and auth_txt.startswith('Bearer '):
         bearer = auth_txt.strip().split(' ')[1]
-        g['bearer'] = bearer
+        g.bearer = bearer
         if bearer == auth_key:  # admin key
             return True
 
