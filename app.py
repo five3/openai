@@ -11,6 +11,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app.route('/api/chatgpt', methods=['POST'])(chatgpt_chat)
 app.route('/api/chatgpt/answer', methods=['GET'])(chatgpt_answer)
+
 app.route('/wechat/login', methods=['POST'])(wechat_login)
 app.route('/wechat/verify', methods=['GET', 'POST'])(verify)
 
@@ -31,4 +32,4 @@ def about():
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 80)
+    app.run('0.0.0.0', 80, threaded=True)

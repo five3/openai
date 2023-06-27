@@ -1,0 +1,13 @@
+{
+  "auth_keys": {
+    "12345": {
+      "times": 100
+    }
+  },
+  "users": {
+    "email": {
+      "password": "12345",
+      "auth_key": "12345"
+    }
+  }
+}
