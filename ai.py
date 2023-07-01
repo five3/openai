@@ -59,7 +59,7 @@ def chatgpt_chat():
     if max_tokens > 1000:
         max_tokens = 1000
 
-    return {"code": 0, "msg": "执行成功", "data": call_gpt(messages, temperature, max_tokens)}
+    return warp_resp({"code": 0, "msg": "执行成功", "data": call_gpt(messages, temperature, max_tokens)})
 
 
 def call_gpt(messages, temperature, max_tokens):
