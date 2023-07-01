@@ -8,7 +8,7 @@ from db import db
 default_module = 'text-davinci-003'
 chat_model = 'gpt-3.5-turbo'
 edit_model = 'text-davinci-edit-001'
-auth_key = os.getenv('AUTH_KEY')
+admin_auth_key = os.getenv('AUTH_KEY')
 message_map = {}
 answer_map = {}
 turns = []
@@ -22,7 +22,7 @@ def chatgpt_answer():
     :return:
     """
     if not auth():
-        return warp_resp("当前用户使用额度已经用户，请联系管理员five3@163.com")
+        return warp_resp("当前用户使用额度已经用完，请联系管理员five3@163.com")
 
     if request.method == 'GET':
         question = request.args.get("question")
@@ -44,7 +44,7 @@ def chatgpt_answer():
 
 def chatgpt_chat():
     if not auth():
-        return {"code": 10000, "msg": "当前用户使用额度已经用户，请联系管理员five3@163.com"}
+        return {"code": 10000, "msg": "当前用户使用额度已经用完，请联系管理员five3@163.com"}
 
     data = request.json
     messages = data.get('messages')
@@ -74,6 +74,62 @@ def call_gpt(messages, temperature, max_tokens):
     return response["choices"][0]["message"]['content'].strip()
 
 
+def ai_login(data):
+    username = data.get('username')
+    password = data.get('password')
+
+    user = db.query_user(username)
+
+    if not user:
+        return False
+
+    if user.get('password') != password:
+        return False
+
+    session['username'] = username
+    session['auth_key'] = user.get('auth_key')
+
+    return True
+
+
+def ai_signup(data):
+    username = data.get('username', '')
+    password = data.get('password', '')
+
+    if not (username.strip() or password.strip()):
+        return False, '用户名、密码不合规'
+
+    if db.query_user(username):
+        return False, '邮箱已注册'
+
+    ip = get_ip()
+    if db.query_reg_ip(ip):
+        return False, '该ip已注册'
+
+    auth_key = db.signup(username, password, ip)
+    session['username'] = username
+    session['auth_key'] = auth_key
+
+    return True, '注册成功'
+
+
+def get_bearer():
+    bearer = None
+    auth_txt = request.headers.get('Authorization')
+    if auth_txt and auth_txt.startswith('Bearer '):
+        bearer = auth_txt.strip().split(' ')[1]
+
+    return bearer
+
+
+def get_ip():
+    ip = request.headers.get('X-Real-Ip')
+    if not ip:
+        ip = request.remote_addr
+
+    return ip
+
+
 def auth():
     if auth_bearer():
         return True
@@ -84,14 +140,14 @@ def auth():
     return auth_anonymous()
 
 
-def auth_bearer():
-    auth_txt = request.headers.get('Authorization')
-    if auth_txt and auth_txt.startswith('Bearer '):
-        bearer = auth_txt.strip().split(' ')[1]
-        g.bearer = bearer
-        if bearer == auth_key:  # admin key
-            return True
+def auth_bearer(bearer=None):
+    if not bearer:
+        bearer = get_bearer()
 
+    if bearer:
+        g.bearer = bearer
+        if bearer == admin_auth_key:  # admin key
+            return True
         return db.verify(bearer)
 
     return False
@@ -99,9 +155,59 @@ def auth_bearer():
 
 def auth_login():
     # 获取用户session，获取绑定的auth_key
-    return False
+    bearer = session.get('auth_key')
+    return auth_bearer(bearer)
 
 
 def auth_anonymous():
-    # 根据ip来查询使用额度, 新用户有50次请求
-    return False
+    # 根据ip来查询使用额度, 匿名用户有20次请求
+    ip = get_ip()
+    ip_item = db.query_ip(ip)
+    bearer = ip_item['auth_key']
+    return auth_bearer(bearer)
+
+
+def active_licence():
+    data = request.json
+    key = data.get('licence')
+    licence = db.query_licence(key)
+
+    if not licence:
+        return {"code": 10000, "msg": "当前license无效，请联系管理员five3@163.com"}
+
+    auth_key = session.get('auth_key')
+    if not auth_key:
+        return {"code": 10000, "msg": "当前license无效用户未登录，请先登录"}
+
+    authed = db.active_licence(auth_key, licence)
+    if not authed:
+        return {"code": 10000, "msg": "认证失败"}
+
+    return {"code": 10000, "msg": f"激活成功. 当前用户: {session.get('username')}， 剩余次数：{authed['times']}"}
+
+
+def is_admin():
+    bearer = get_bearer()
+    if bearer != admin_auth_key:
+        return False
+
+    return True
+
+
+def create_licence():
+    count = request.json.get('count', 0)
+    if not isinstance(count, int) or count < 1:
+        return {"code": 10000, "msg": "参数无效"}
+
+    if not is_admin():
+        return {"code": 10000, "msg": "认证失败"}
+
+    licence = db.create_licence(count)
+    return {"code": 10000, "data": licence}
+
+
+def view_db():
+    if not is_admin():
+        return {"code": 10000, "msg": "认证失败"}
+
+    return db.db

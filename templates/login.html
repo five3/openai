@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+  <title>登录</title>
+  <link
+    rel="shortcut icon"
+    href="{{ url_for('static', filename='dog.png') }}"
+  />
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+</head>
+
+<body>
+  <img src="{{ url_for('static', filename='dog.png') }}" class="icon" />
+  <h3>登录</h3>
+  <form action="/login" method="post">
+    <input type="text" name="username" placeholder="输入邮箱" required />
+    <input type="password" name="password" placeholder="输入密码" required />
+    <input type="submit" value="登录" />
+    {% if msg %}
+    <div class="result">{{ msg }}</div>
+    {% endif %}
+  </form>
+  <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备12050610号-4</a>
+</body>
