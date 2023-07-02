@@ -64,9 +64,9 @@ def chatgpt_chat():
     if temperature < 0 or temperature > 1:
         temperature = 0
 
-    max_tokens = data.get('max_tokens', 500)
-    if max_tokens > 1000:
-        max_tokens = 1000
+    max_tokens = data.get('max_tokens', 2000)
+    if max_tokens > 2000:
+        max_tokens = 2000
 
     return warp_resp({"code": 0, "msg": "执行成功", "data": call_gpt(ms, temperature, max_tokens)})
 
