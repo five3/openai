@@ -66,15 +66,19 @@ def chatgpt_chat():
 def call_gpt(messages, temperature, max_tokens, use_markdown=True):
     if use_markdown:
         messages[-1]['content'] += '。以markdown格式返回内容'
-    response = openai.ChatCompletion.create(
-        model=chat_model,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens
-    )
-    db.decr(g.bearer)
 
-    return response["choices"][0]["message"]['content'].strip()
+    try:
+        response = openai.ChatCompletion.create(
+            model=chat_model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens
+        )
+        db.decr(g.bearer)
+
+        return response["choices"][0]["message"]['content'].strip()
+    except Exception as e:
+        return "请求token超长，最大支持长度为：4096。你可以选择清空当前会话内容，再次进行提问。"
 
 
 def call_gpt_stram():
