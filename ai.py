@@ -89,6 +89,8 @@ def call_gpt_stram():
         chunk_message = chunk["choices"][0]['delta']
         print(chunk_message, end='')
 
+    return "ok"
+
 
 def ai_login(data):
     username = data.get('username')
