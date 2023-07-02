@@ -24,7 +24,8 @@ app.route('/wechat/verify', methods=['GET', 'POST'])(verify)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html", result="")
+    username = session.get('username', '')
+    return render_template("index.html", username=username)
 
 
 @app.route("/signup", methods=['GET', 'POST'])
