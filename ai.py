@@ -1,5 +1,6 @@
 import os
 import openai
+import logging
 
 from flask import request, session, g
 from util import warp_resp
@@ -86,7 +87,7 @@ def call_gpt_stram():
         timeout=3
     )
     for chunk in response:
-        chunk_message = chunk["choices"][0]['delta']
+        chunk_message = chunk["choices"][0]['delta']['content']
         print(chunk_message, end='')
 
     return "ok"
