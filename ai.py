@@ -51,15 +51,6 @@ def chatgpt_chat():
     if not messages:
         return {"code": 10001, "msg": "提示词为空"}
 
-    ms = []
-    for m in messages:
-        ms.append(
-            {
-                "role": m.get('role'),
-                "content": m.get('content')
-            }
-        )
-
     temperature = data.get('temperature', 0)
     if temperature < 0 or temperature > 1:
         temperature = 0
@@ -68,7 +59,7 @@ def chatgpt_chat():
     if max_tokens > 2000:
         max_tokens = 2000
 
-    return warp_resp({"code": 0, "msg": "执行成功", "data": call_gpt(ms, temperature, max_tokens)})
+    return warp_resp({"code": 0, "msg": "执行成功", "data": call_gpt(messages, temperature, max_tokens)})
 
 
 def call_gpt(messages, temperature, max_tokens):

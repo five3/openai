@@ -28,7 +28,7 @@ def index():
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
-        return render_template("signup.html", msg="")
+        return render_template("signup.html", msg="新用户将免费获得30次查询额度")
     else:
         # 注册成功，再返回主页，新用户赠送50次，一个ip只能注册一个
         ret, msg = ai_signup(request.form)
