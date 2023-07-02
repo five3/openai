@@ -39,7 +39,7 @@ def chatgpt_answer():
     else:
         return ""
 
-    return warp_resp(call_gpt(messages, 0, 1000))
+    return warp_resp(call_gpt(messages, 0, 1000, False))
 
 
 def chatgpt_chat():
@@ -62,7 +62,9 @@ def chatgpt_chat():
     return warp_resp({"code": 0, "msg": "执行成功", "data": call_gpt(messages, temperature, max_tokens)})
 
 
-def call_gpt(messages, temperature, max_tokens):
+def call_gpt(messages, temperature, max_tokens, use_markdown=True):
+    if use_markdown:
+        messages[-1]['content'] += '。以markdown格式返回内容'
     response = openai.ChatCompletion.create(
         model=chat_model,
         messages=messages,
@@ -72,6 +74,20 @@ def call_gpt(messages, temperature, max_tokens):
     db.decr(g.bearer)
 
     return response["choices"][0]["message"]['content'].strip()
+
+
+def call_gpt_stram():
+    response = openai.ChatCompletion.create(
+        model=chat_model,
+        messages=[{"role": "user", "content": '中国56个民族的名字'}],
+        temperature=0.0,
+        max_tokens=500,
+        stream=True,
+        timeout=3
+    )
+    for chunk in response:
+        chunk_message = chunk["choices"][0]['delta']
+        print(chunk_message, end='')
 
 
 def ai_login(data):
