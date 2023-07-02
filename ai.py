@@ -83,9 +83,13 @@ def call_gpt(messages, temperature, max_tokens, use_markdown=True):
 
 
 def call_gpt_stram():
+    if not auth():
+        return {"code": 10000, "msg": "当前用户使用额度已经用完，请联系管理员five3@163.com"}
+
+    content = request.args.get('question')
     response = openai.ChatCompletion.create(
         model=chat_model,
-        messages=[{"role": "user", "content": '中国56个民族的名字'}],
+        messages=[{"role": "user", "content": content}],
         temperature=0.0,
         max_tokens=500,
         stream=True,
@@ -93,7 +97,7 @@ def call_gpt_stram():
     )
     for chunk in response:
         chunk_message = chunk["choices"][0]['delta'].get('content')
-        print(chunk_message, end='')
+        logging.info(chunk_message)
 
     return "ok"
 
