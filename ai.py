@@ -74,11 +74,12 @@ def call_gpt(messages, temperature, max_tokens, use_markdown=True):
             temperature=temperature,
             max_tokens=max_tokens
         )
-        db.decr(g.bearer)
 
         return response["choices"][0]["message"]['content'].strip()
     except Exception as e:
         return "请求token超长，最大支持长度为：4096。你可以选择清空当前会话内容，再次进行提问。"
+    finally:
+        db.decr(g.bearer)
 
 
 def call_gpt_stram():
