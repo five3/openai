@@ -87,7 +87,7 @@ def call_gpt_stram():
         timeout=3
     )
     for chunk in response:
-        chunk_message = chunk["choices"][0]['delta']['content']
+        chunk_message = chunk["choices"][0]['delta'].get('content')
         print(chunk_message, end='')
 
     return "ok"
