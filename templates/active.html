@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-  <title>关于</title>
+  <title>激活</title>
   <link
     rel="shortcut icon"
     href="{{ url_for('static', filename='dog.png') }}"
@@ -10,8 +10,14 @@
 
 <body>
   <img src="{{ url_for('static', filename='dog.png') }}" class="icon" />
-  <h3>当前登录用户：{{ username }}</h3>
-  <div class="result">该用户剩余查询额度为：{{ times }}，需要增加额度请联系five3@163.com.</div>
+  <h3>激活</h3>
+  <form action="/active" method="post">
+    <input type="text" name="licence" placeholder="输入激活码" required />
+    <input type="submit" value="激活" />
+  </form>
+  {% if result %}
+  <div class="result">{{ result }}</div>
+  {% endif %}
 
   <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备12050610号-4</a>
 </body>

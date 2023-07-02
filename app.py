@@ -1,8 +1,8 @@
 import os
 
 import openai
-from flask import Flask, redirect, render_template, request, url_for
-from ai import chatgpt_chat, chatgpt_answer, ai_login, ai_signup, active_licence, create_licence, view_db
+from flask import Flask, redirect, render_template, request, url_for, session
+from ai import chatgpt_chat, chatgpt_answer, ai_login, ai_signup, active_licence, create_licence, view_db, get_times
 from wechat import wechat_login, verify
 
 app = Flask(__name__)
@@ -40,6 +40,8 @@ def signup():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
+        if session.get('username'):     # 已登录用户
+            return render_template("about.html", username=session['username'], times=get_times())
         return render_template("login.html", msg="")
     else:
         # 认证后设置session，再返回主页
@@ -50,9 +52,17 @@ def login():
             return render_template("login.html", msg="认证失败")
 
 
-@app.route("/about")
-def about():
-    return render_template("about.html", result="")
+@app.route("/active", methods=['GET', 'POST'])
+def active():
+    if request.method == 'GET':
+        if session.get('username'):  # 已登录用户
+            result = f'当前用户剩余查询额度：{get_times()}'
+        else:
+            result = '当前用户未登录，请先登录后再进行激活操作'
+        return render_template("active.html", result=result)
+    else:
+        rep = active_licence()
+        return render_template("active.html", result=rep['msg'])
 
 
 if __name__ == '__main__':

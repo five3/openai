@@ -177,22 +177,22 @@ def auth_anonymous():
 
 
 def active_licence():
-    data = request.json
+    data = request.json or request.form
     key = data.get('licence')
     licence = db.query_licence(key)
 
     if not licence:
-        return {"code": 10000, "msg": "当前license无效，请联系管理员five3@163.com"}
+        return {"code": 10000, "success": False, "msg": "当前license无效，请联系管理员five3@163.com"}
 
     auth_key = session.get('auth_key')
     if not auth_key:
-        return {"code": 10000, "msg": "当前license无效用户未登录，请先登录"}
+        return {"code": 10000, "success": False, "msg": "当前license无效用户未登录，请先登录"}
 
     authed = db.active_licence(auth_key, licence)
     if not authed:
-        return {"code": 10000, "msg": "认证失败"}
+        return {"code": 10000, "success": False, "msg": "认证失败"}
 
-    return {"code": 10000, "msg": f"激活成功. 当前用户: {session.get('username')}， 剩余次数：{authed['times']}"}
+    return {"code": 10000, "success": False, "msg": f"激活成功. 当前用户: {session.get('username')}， 剩余次数：{authed['times']}"}
 
 
 def is_admin():
@@ -220,3 +220,7 @@ def view_db():
         return {"code": 10000, "msg": "认证失败"}
 
     return db.db
+
+
+def get_times():
+    return db.query_auth_key(session['auth_key']).get('times', 0)

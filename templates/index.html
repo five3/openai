@@ -1,23 +1,42 @@
 <!DOCTYPE html>
-<head>
-  <title>OpenAI Quickstart</title>
-  <link
-    rel="shortcut icon"
-    href="{{ url_for('static', filename='dog.png') }}"
-  />
-  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
-</head>
-
-<body>
-  <img src="{{ url_for('static', filename='dog.png') }}" class="icon" />
-  <h3>Name my pet</h3>
-  <form action="/" method="post">
-    <input type="text" name="animal" placeholder="Enter an animal" required />
-    <input type="submit" value="Generate names" />
-  </form>
-  {% if result %}
-  <div class="result">{{ result }}</div>
-  {% endif %}
-
-  <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备12050610号-4</a>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>chatGPT</title>
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='dog.png') }}"
+    />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        *:before, *:after {
+            box-sizing: inherit;
+        }
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+        body, ul {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            color: #4d4d4d;
+            font: 14px/1.4em 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background: #f5f5f5 url('static/chat/images/bg.jpg') no-repeat center;
+            background-size: cover;
+            font-smoothing: antialiased;
+        }
+        ul {
+            list-style: none;
+        }
+    </style>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <app></app>
+    <script src="static/chat/build.js"></script>
+  </body>
+</html>
