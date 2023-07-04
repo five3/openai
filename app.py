@@ -1,5 +1,5 @@
 import os
-
+import sys
 import openai
 from flask import Flask, redirect, render_template, request, url_for, session
 from ai import chatgpt_chat, chatgpt_answer, ai_login, ai_signup, active_licence, create_licence, view_db, get_times, call_gpt_stram
@@ -69,4 +69,7 @@ def active():
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 80, threaded=True)
+    port = 80
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    app.run('0.0.0.0', port, threaded=True)

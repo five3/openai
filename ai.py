@@ -65,7 +65,7 @@ def chatgpt_chat():
 
 def call_gpt(messages, temperature, max_tokens, use_markdown=True):
     if use_markdown:
-        messages[-1]['content'] += '。最后将你要回答的内容以markdown格式返回'
+        messages[-1]['content'] += '。最后将你要回答的内容以markdown格式返回给我'
 
     try:
         response = openai.ChatCompletion.create(
