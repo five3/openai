@@ -121,7 +121,7 @@ def call_gpt_stream(messages, temperature, max_tokens):
 
                 for chunk in response:
                     chunk_message = chunk["choices"][0]['delta'].get('content')
-                    time.sleep(0.2)
+                    time.sleep(0.1)
                     yield chunk_message
 
         return Response(generate(), mimetype='text/plain')
