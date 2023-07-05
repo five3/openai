@@ -1,8 +1,10 @@
 import os
+import time
+
 import openai
 import logging
 
-from flask import request, session, g
+from flask import request, session, g, Response, make_response
 from util import warp_resp
 from db import db
 
@@ -10,6 +12,7 @@ default_module = 'text-davinci-003'
 chat_model = 'gpt-3.5-turbo'
 edit_model = 'text-davinci-edit-001'
 admin_auth_key = os.getenv('AUTH_KEY')
+is_local = os.getenv('IS_LOCAL', 'false')
 message_map = {}
 answer_map = {}
 turns = []
@@ -40,32 +43,45 @@ def chatgpt_answer():
     else:
         return ""
 
-    return warp_resp(call_gpt(messages, 0, 1000, False))
+    return call_gpt(messages, 0, 4000)
 
 
 def chatgpt_chat():
-    if not auth():
-        return {"code": 10000, "msg": "当前用户使用额度已经用完，请联系管理员five3@163.com"}
-
     data = request.json
     messages = data.get('messages')
-    if not messages:
-        return {"code": 10001, "msg": "提示词为空"}
 
     temperature = data.get('temperature', 0)
     if temperature < 0 or temperature > 1:
         temperature = 0
 
-    max_tokens = data.get('max_tokens', 2000)
-    if max_tokens > 2000:
-        max_tokens = 2000
+    max_tokens = data.get('max_tokens', 4000)
+    is_stream = data.get('is_stream', True)
 
-    return warp_resp({"code": 0, "msg": "执行成功", "data": call_gpt(messages, temperature, max_tokens)})
+    return call_gpt(messages, temperature, max_tokens, is_stream)
 
 
-def call_gpt(messages, temperature, max_tokens, use_markdown=True):
-    if use_markdown:
-        messages[-1]['content'] += '。最后将你要回答的内容以markdown格式返回给我'
+def call_gpt(messages, temperature, max_tokens, is_stream=True):
+    if is_stream:
+        if not messages:
+            return warp_resp("提示词为空")
+
+        if not auth():
+            return warp_resp("当前用户使用额度已经用完，请联系管理员five3@163.com")
+
+        return call_gpt_stream(messages, temperature, max_tokens)
+    else:
+        if not messages:
+            return warp_resp({"code": 10001, "msg": "提示词为空"})
+
+        if not auth():
+            return warp_resp({"code": 10000, "msg": "当前用户使用额度已经用完，请联系管理员five3@163.com"})
+
+        return warp_resp({"code": 0, "msg": "执行成功", "data": call_gpt_normal(messages, temperature, max_tokens)})
+
+
+def call_gpt_normal(messages, temperature, max_tokens):
+    if not max_tokens:
+        max_tokens = float('inf')       # 无穷大
 
     try:
         response = openai.ChatCompletion.create(
@@ -82,24 +98,36 @@ def call_gpt(messages, temperature, max_tokens, use_markdown=True):
         db.decr(g.bearer)
 
 
-def call_gpt_stram():
-    if not auth():
-        return {"code": 10000, "msg": "当前用户使用额度已经用完，请联系管理员five3@163.com"}
+def call_gpt_stream(messages, temperature, max_tokens):
+    if not max_tokens:
+        max_tokens = float('inf')       # 无穷大
 
-    content = request.args.get('question')
-    response = openai.ChatCompletion.create(
-        model=chat_model,
-        messages=[{"role": "user", "content": content}],
-        temperature=0.0,
-        max_tokens=500,
-        stream=True,
-        timeout=3
-    )
-    for chunk in response:
-        chunk_message = chunk["choices"][0]['delta'].get('content')
-        logging.info(chunk_message)
+    try:
+        def generate():
+            if is_local == 'true':
+                response = "我是一个大帅哥，我的名字叫macy。很高兴认识你！"
+                for chunk in response:
+                    time.sleep(0.2)
+                    yield chunk
+            else:
+                response = openai.ChatCompletion.create(
+                    model=chat_model,
+                    messages=messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    stream=True,
+                    timeout=3
+                )
 
-    return "ok"
+                for chunk in response:
+                    chunk_message = chunk["choices"][0]['delta'].get('content')
+                    yield chunk_message
+
+        return Response(generate(), mimetype='text/plain')
+    except Exception as e:
+        return make_response("请求token超长，最大支持长度为：4096。你可以选择清空当前会话内容，再次进行提问。")
+    finally:
+        db.decr(g.bearer)
 
 
 def ai_login(data):

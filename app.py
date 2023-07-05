@@ -2,7 +2,8 @@ import os
 import sys
 import openai
 from flask import Flask, redirect, render_template, request, url_for, session
-from ai import chatgpt_chat, chatgpt_answer, ai_login, ai_signup, active_licence, create_licence, view_db, get_times, call_gpt_stram
+from ai import chatgpt_chat, chatgpt_answer, ai_login, ai_signup, active_licence, create_licence, \
+                view_db, get_times
 from wechat import wechat_login, verify
 
 app = Flask(__name__)
@@ -10,7 +11,6 @@ app.config['SECRET_KEY'] = os.urandom(16)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-app.route('/api/chatV2', methods=['GET'])(call_gpt_stram)
 app.route('/api/db', methods=['GET'])(view_db)
 app.route('/api/create/licence', methods=['POST'])(create_licence)
 app.route('/api/active/licence', methods=['POST'])(active_licence)
