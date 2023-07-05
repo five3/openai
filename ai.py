@@ -43,7 +43,7 @@ def chatgpt_answer():
     else:
         return ""
 
-    return call_gpt(messages, 0, 4000)
+    return call_gpt(messages, 0, 3000)
 
 
 def chatgpt_chat():
@@ -54,7 +54,7 @@ def chatgpt_chat():
     if temperature < 0 or temperature > 1:
         temperature = 0
 
-    max_tokens = data.get('max_tokens', 4000)
+    max_tokens = data.get('max_tokens', 3000)
     is_stream = data.get('is_stream', True)
 
     return call_gpt(messages, temperature, max_tokens, is_stream)
