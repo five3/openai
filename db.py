@@ -92,15 +92,10 @@ class DB:
             fork_lock.release()
 
     def signup(self, username, password, ip):
-        if ip in self._ip_:
-            auth_key = self._ip_[ip]['auth_key']
-            auth = self._auth_keys_[auth_key]
-            auth['times'] += 30
-        else:
-            auth_key = str(uuid.uuid1())
-            self._auth_keys_[auth_key] = {
-                'times': 30
-            }
+        auth_key = str(uuid.uuid1())
+        self._auth_keys_[auth_key] = {
+            'times': 30
+        }
 
         self._users_[username] = {
             'password': password,

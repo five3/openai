@@ -43,7 +43,7 @@ def chatgpt_answer():
     else:
         return ""
 
-    return call_gpt(messages, 0, 3000)
+    return call_gpt(messages, 0, 3000)      # 问答响应单次限制3000token
 
 
 def chatgpt_chat():
@@ -54,7 +54,7 @@ def chatgpt_chat():
     if temperature < 0 or temperature > 1:
         temperature = 0
 
-    max_tokens = data.get('max_tokens', 3000)
+    max_tokens = data.get('max_tokens', 0)  # 由前端限制上下文长度、回答长度不限制
     is_stream = data.get('is_stream', True)
 
     return call_gpt(messages, temperature, max_tokens, is_stream)
