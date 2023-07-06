@@ -54,7 +54,7 @@ def chatgpt_chat():
     if temperature < 0 or temperature > 1:
         temperature = 0
 
-    max_tokens = data.get('max_tokens', 2000)  # 由前端限制上下文长度、回答长度不限制
+    max_tokens = data.get('max_tokens', None)  # 由前端限制上下文长度、回答长度不限制
     is_stream = data.get('is_stream', True)
 
     return call_gpt(messages, temperature, max_tokens, is_stream)
@@ -84,12 +84,19 @@ def call_gpt_normal(messages, temperature, max_tokens):
         max_tokens = float('inf')       # 无穷大
 
     try:
-        response = openai.ChatCompletion.create(
-            model=chat_model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens
-        )
+        if max_tokens:
+            response = openai.ChatCompletion.create(
+                model=chat_model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens
+            )
+        else:
+            response = openai.ChatCompletion.create(
+                model=chat_model,
+                messages=messages,
+                temperature=temperature
+            )
 
         return response["choices"][0]["message"]['content'].strip()
     except Exception as e:
@@ -99,9 +106,6 @@ def call_gpt_normal(messages, temperature, max_tokens):
 
 
 def call_gpt_stream(messages, temperature, max_tokens):
-    if not max_tokens:
-        max_tokens = float('inf')       # 无穷大
-
     try:
         def generate():
             if is_local == 'true':
@@ -110,14 +114,23 @@ def call_gpt_stream(messages, temperature, max_tokens):
                     time.sleep(0.2)
                     yield chunk
             else:
-                response = openai.ChatCompletion.create(
-                    model=chat_model,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    stream=True,
-                    timeout=3
-                )
+                if max_tokens:
+                    response = openai.ChatCompletion.create(
+                        model=chat_model,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        stream=True,
+                        timeout=3
+                    )
+                else:
+                    response = openai.ChatCompletion.create(
+                        model=chat_model,
+                        messages=messages,
+                        temperature=temperature,
+                        stream=True,
+                        timeout=3
+                    )
 
                 for chunk in response:
                     chunk_message = chunk["choices"][0]['delta'].get('content')
