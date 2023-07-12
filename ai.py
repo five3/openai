@@ -28,22 +28,18 @@ def chatgpt_answer():
     if not auth():
         return warp_resp("当前用户使用额度已经用完，请联系管理员five3@163.com")
 
-    if request.method == 'GET':
-        question = request.args.get("question")
-        if not question or question.strip() == '':
-            return warp_resp("问题不能为空")
-        messages = [
-            {
-                "role": "user",
-                "content": question
-            }
-        ]
-    elif request.method == 'POST':
-        messages = request.json
-    else:
-        return ""
+    question = request.args.get("question")
+    model = request.args.get("model", default_chat_model)
+    if not question or question.strip() == '':
+        return warp_resp("问题不能为空")
+    messages = [
+        {
+            "role": "user",
+            "content": question
+        }
+    ]
 
-    return call_gpt(messages, 0, 3000)      # 问答响应单次限制3000token
+    return call_gpt(messages, model, 0, 3000)      # 问答响应单次限制3000token
 
 
 def chatgpt_chat():
