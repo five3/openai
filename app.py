@@ -3,7 +3,7 @@ import sys
 import openai
 from flask import Flask, redirect, render_template, request, url_for, session
 from ai import chatgpt_chat, chatgpt_answer, ai_login, ai_signup, active_licence, create_licence, \
-                view_db, get_times
+                view_db, get_times, chatgpt_chat_stop
 from wechat import wechat_login, verify
 
 app = Flask(__name__)
@@ -16,13 +16,24 @@ app.route('/api/create/licence', methods=['POST'])(create_licence)
 app.route('/api/active/licence', methods=['POST'])(active_licence)
 
 app.route('/api/chatgpt', methods=['POST'])(chatgpt_chat)
+app.route('/api/chatgpt/stop', methods=['POST'])(chatgpt_chat_stop)
 app.route('/api/chatgpt/answer', methods=['GET'])(chatgpt_answer)
 
 app.route('/wechat/login', methods=['POST'])(wechat_login)
 app.route('/wechat/verify', methods=['GET', 'POST'])(verify)
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/law", methods=["GET"])
+def law():
+    return render_template("law.html")
+
+
+@app.route("/role", methods=["GET"])
+def role():
+    return render_template("role.html")
+
+
+@app.route("/", methods=["GET"])
 def index():
     username = session.get('username', '')
     return render_template("index.html", username=username)

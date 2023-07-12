@@ -60,6 +60,12 @@ def chatgpt_chat():
     return call_gpt(messages, temperature, max_tokens, is_stream)
 
 
+def chatgpt_chat_stop():
+    data = request.json
+
+    return warp_resp({"success": True})
+
+
 def call_gpt(messages, temperature, max_tokens, is_stream=True):
     if is_stream:
         if not messages:
